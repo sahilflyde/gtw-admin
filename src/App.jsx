@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard';
 import GetStartedFormsPage from './pages/GetStartedForms/GetStartedFormsPage';
 import JoinTeamPage from './pages/JoinTeam/JoinTeamPage';
 import AgencyPartnershipPage from './pages/AgencyPartnership/AgencyPartnershipPage';
+import SubscriptionsPage from './pages/Subscriptions/SubscriptionsPage';
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -43,6 +44,7 @@ function App() {
                     <Route path="/get-started-forms" element={<GetStartedFormsPage />} />
                     <Route path="/join-team" element={<JoinTeamPage />} />
                     <Route path="/agency-partnership" element={<AgencyPartnershipPage />} />
+                    <Route path="/subscriptions" element={<SubscriptionsPage />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>
                 </ApplicationLayout>

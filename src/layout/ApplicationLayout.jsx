@@ -54,6 +54,7 @@ import {
   PresentationChartBarIcon,
   TagIcon,
   PhotoIcon,
+  EnvelopeIcon,
 } from "@heroicons/react/20/solid";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
@@ -139,6 +140,14 @@ export function ApplicationLayout({ children }) {
               >
                 <SparklesIcon />
                 <SidebarLabel>Agency Partnership</SidebarLabel>
+              </SidebarItem>
+
+              <SidebarItem
+                href="/subscriptions"
+                current={location.pathname.startsWith("/subscriptions")}
+              >
+                <EnvelopeIcon />
+                <SidebarLabel>Subscriptions</SidebarLabel>
               </SidebarItem>
 
               {/* <SidebarItem
