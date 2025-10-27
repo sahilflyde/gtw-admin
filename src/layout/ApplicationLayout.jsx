@@ -30,6 +30,7 @@ import {
 import { SidebarLayout } from "../components/sidebar-layout.jsx";
 import {
   ArrowRightStartOnRectangleIcon,
+  CheckBadgeIcon,
   ChevronDownIcon,
   ChevronUpIcon,
   Cog8ToothIcon,
@@ -150,13 +151,13 @@ export function ApplicationLayout({ children }) {
                 <SidebarLabel>Subscriptions</SidebarLabel>
               </SidebarItem>
 
-              {/* <SidebarItem
-                href="/categories"
-                current={location.pathname.startsWith("/categories")}
+              <SidebarItem
+                href="/success-stories"
+                current={location.pathname.startsWith("/success-stories")}
               >
-                <TagIcon />
-                <SidebarLabel>Category</SidebarLabel>
-              </SidebarItem> */}
+                <CheckBadgeIcon />
+                <SidebarLabel>Success Stories</SidebarLabel>
+              </SidebarItem>
 
               {/* <SidebarItem
                 href="/subcategories"
@@ -173,7 +174,6 @@ export function ApplicationLayout({ children }) {
                 <UserCircleIcon />
                 <SidebarLabel>Customers</SidebarLabel>
               </SidebarItem> */}
-
 
               {/* <SidebarItem
                 href="/marketing"
@@ -203,11 +203,6 @@ export function ApplicationLayout({ children }) {
                     <CubeIcon />
                     <SidebarLabel>Content</SidebarLabel>
                 </SidebarItem> */}
-
-
-
-
-
 
               {/* <SidebarItem
                 href="/markets"

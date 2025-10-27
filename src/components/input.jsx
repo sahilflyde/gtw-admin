@@ -48,7 +48,7 @@ export const Input = forwardRef(function Input(
       <Headless.Input
         ref={ref}
         {...props}
-        className={clsx([
+        className={clsx([ 
           // Date classes
           props.type &&
             dateTypes.includes(props.type) && [
