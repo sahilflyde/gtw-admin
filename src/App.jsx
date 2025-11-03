@@ -17,6 +17,8 @@ import JoinTeamPage from "./pages/JoinTeam/JoinTeamPage";
 import AgencyPartnershipPage from "./pages/AgencyPartnership/AgencyPartnershipPage";
 import SubscriptionsPage from "./pages/Subscriptions/SubscriptionsPage";
 import SuccessStoriesPage from "./pages/SuccessStories/successStoriesPage.jsx";
+import HirezyContactForms from "./pages/HirezyContactForm.jsx";
+import HirezySignupForms from "./pages/HirezySignupForm.jsx";
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -67,6 +69,14 @@ function App() {
                     <Route
                       path="/success-stories"
                       element={<SuccessStoriesPage />}
+                    />
+                    <Route
+                      path="/hirezy-contact"
+                      element={<HirezyContactForms />}
+                    />
+                    <Route
+                      path="/hirezy-signup"
+                      element={<HirezySignupForms />}
                     />
                     <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>

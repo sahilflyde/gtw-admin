@@ -30,6 +30,9 @@ import {
 import { SidebarLayout } from "../components/sidebar-layout.jsx";
 import {
   ArrowRightStartOnRectangleIcon,
+  BookmarkSlashIcon,
+  BookmarkSquareIcon,
+  BookOpenIcon,
   CheckBadgeIcon,
   ChevronDownIcon,
   ChevronUpIcon,
@@ -40,6 +43,7 @@ import {
   RectangleStackIcon,
   ShieldCheckIcon,
   Square3Stack3DIcon,
+  Squares2X2Icon,
   UserCircleIcon,
 } from "@heroicons/react/16/solid";
 import {
@@ -157,6 +161,22 @@ export function ApplicationLayout({ children }) {
               >
                 <CheckBadgeIcon />
                 <SidebarLabel>Success Stories</SidebarLabel>
+              </SidebarItem>
+
+              <SidebarItem
+                href="/hirezy-signup"
+                current={location.pathname.startsWith("/hirezy-signup")}
+              >
+                <Squares2X2Icon />
+                <SidebarLabel>Hirezy Signup Enteries</SidebarLabel>
+              </SidebarItem>
+
+              <SidebarItem
+                href="/hirezy-contact"
+                current={location.pathname.startsWith("/hirezy-contact")}
+              >
+                <Squares2X2Icon />
+                <SidebarLabel>Hirezy Contact Form</SidebarLabel>
               </SidebarItem>
 
               {/* <SidebarItem
