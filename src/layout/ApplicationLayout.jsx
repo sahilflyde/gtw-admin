@@ -170,6 +170,13 @@ export function ApplicationLayout({ children }) {
                 <Squares2X2Icon />
                 <SidebarLabel>Hirezy Signup Enteries</SidebarLabel>
               </SidebarItem>
+              <SidebarItem
+                href="/framework-pdf-forms"
+                current={location.pathname.startsWith("/framework-pdf-forms")}
+              >
+                <Squares2X2Icon />
+                <SidebarLabel>Framework PDF Enteries</SidebarLabel>
+              </SidebarItem>
 
               <SidebarItem
                 href="/hirezy-contact"
@@ -177,6 +184,14 @@ export function ApplicationLayout({ children }) {
               >
                 <Squares2X2Icon />
                 <SidebarLabel>Hirezy Contact Form</SidebarLabel>
+              </SidebarItem>
+
+              <SidebarItem
+                href="/case-studies"
+                current={location.pathname.startsWith("/case-studies")}
+              >
+                <Squares2X2Icon />
+                <SidebarLabel>Case Studies</SidebarLabel>
               </SidebarItem>
 
               {/* <SidebarItem

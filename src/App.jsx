@@ -19,6 +19,8 @@ import SubscriptionsPage from "./pages/Subscriptions/SubscriptionsPage";
 import SuccessStoriesPage from "./pages/SuccessStories/successStoriesPage.jsx";
 import HirezyContactForms from "./pages/HirezyContactForm.jsx";
 import HirezySignupForms from "./pages/HirezySignupForm.jsx";
+import CaseStudiesPage from "./pages/caseStudies.jsx";
+import FormsPage from "./pages/Subscriptions/frameworkPdfEnteries.jsx";
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -70,6 +72,7 @@ function App() {
                       path="/success-stories"
                       element={<SuccessStoriesPage />}
                     />
+                    <Route path="/case-studies" element={<CaseStudiesPage />} />
                     <Route
                       path="/hirezy-contact"
                       element={<HirezyContactForms />}
@@ -77,6 +80,10 @@ function App() {
                     <Route
                       path="/hirezy-signup"
                       element={<HirezySignupForms />}
+                    />
+                    <Route
+                      path="/framework-pdf-forms"
+                      element={<FormsPage />}
                     />
                     <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>

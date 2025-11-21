@@ -27,6 +27,7 @@ export default function SuccessStoriesPage() {
     description: "",
     photo: null,
     logo: null,
+    slug: "",
   });
 
   // 🧠 Fetch all stories
@@ -49,9 +50,11 @@ export default function SuccessStoriesPage() {
 
   // 🧾 Handle Input Change
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: name === "slug" ? value.toLowerCase() : value,
     });
   };
 
@@ -70,6 +73,8 @@ export default function SuccessStoriesPage() {
       data.append("founderName", formData.founderName);
       data.append("founderPost", formData.founderPost);
       data.append("description", formData.description);
+      data.append("slug", formData.slug);
+
       if (formData.photo) data.append("photo", formData.photo);
       if (formData.logo) data.append("logo", formData.logo);
 
@@ -93,6 +98,7 @@ export default function SuccessStoriesPage() {
         description: "",
         photo: null,
         logo: null,
+        slug: "",
       });
       fetchStories();
     } catch (err) {
@@ -123,6 +129,7 @@ export default function SuccessStoriesPage() {
       description: story.description,
       photo: null,
       logo: null,
+      slug: story.slug,
     });
     setIsDialogOpen(true);
   };
@@ -136,6 +143,7 @@ export default function SuccessStoriesPage() {
       description: "",
       photo: null,
       logo: null,
+      slug: "",
     });
     setIsDialogOpen(true);
   };
@@ -164,6 +172,7 @@ export default function SuccessStoriesPage() {
         <Table>
           <TableHead>
             <TableRow>
+              <TableHeader>Slug</TableHeader>
               <TableHeader>Founder</TableHeader>
               <TableHeader>Post</TableHeader>
               <TableHeader>Description</TableHeader>
@@ -189,6 +198,7 @@ export default function SuccessStoriesPage() {
                   key={story._id}
                   className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
                 >
+                  <TableCell className="font-medium">{story.slug}</TableCell>
                   <TableCell className="font-medium">
                     {story.founderName}
                   </TableCell>
@@ -248,6 +258,18 @@ export default function SuccessStoriesPage() {
           </Heading>
 
           <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-zinc-600 mb-1">
+                Slug
+              </label>
+              <Input
+                name="slug"
+                value={formData.slug}
+                onChange={handleChange}
+                placeholder="Enter slug"
+                required
+              />
+            </div>
             <div>
               <label className="block text-sm font-medium text-zinc-600 mb-1">
                 Founder Name
@@ -273,8 +295,6 @@ export default function SuccessStoriesPage() {
               />
             </div>
             <div className="col-span-2">
-
-
               <label className="block text-sm font-medium text-zinc-600 mb-1">
                 Description
               </label>
@@ -285,11 +305,10 @@ export default function SuccessStoriesPage() {
                 rows={4}
                 placeholder="Enter success story description"
                 required
+                className="w-full "
               />
             </div>
             <div>
-
-              
               <label className="block text-sm font-medium text-zinc-600 mb-1">
                 Photo
               </label>
