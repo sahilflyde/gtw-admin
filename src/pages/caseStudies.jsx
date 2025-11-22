@@ -16,24 +16,35 @@ import { Dialog } from "../components/dialog";
 import { Input } from "../components/input";
 import api from "../utils/api";
 
+/* -------------------------- EMPTY SECTION GENERATOR -------------------------- */
+const createEmptySection = (type = "text") => {
+  switch (type) {
+    case "text":
+      return { type: "text", head: "", content: "" };
+
+    case "image":
+      return { type: "image", imageSrc: "", imageAlt: "", content: "" };
+
+    case "list":
+      return { type: "list", head: "", content: [] };
+
+    case "list2":
+      return { type: "list2", head: "", content: [] };
+
+    case "testimonial":
+      return { type: "testimonial", quote: "", author: "", position: "" };
+
+    default:
+      return { type: "text", head: "", content: "" };
+  }
+};
+
 export default function CaseStudiesPage() {
   const [cases, setCases] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Modal states
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCase, setEditingCase] = useState(null);
-
-  // STATIC STATIC STATIC STRUCTURE
-  const emptyList = (count) =>
-    Array(count)
-      .fill()
-      .map(() => ({ listing: "", subListing: "" }));
-
-  const emptyList2 = (count) =>
-    Array(count)
-      .fill()
-      .map(() => ({ listing: "" }));
 
   const [formData, setFormData] = useState({
     slug: "",
@@ -44,32 +55,11 @@ export default function CaseStudiesPage() {
     category: "",
     tags: "",
     heroImage: "",
-
-    // SECTIONS
-    sec1_head: "",
-    sec1_content: "",
-
-    sec2_head: "",
-    sec2_content: "",
-
-    sec3_head: "",
-    sec3_list: emptyList(4),
-
-    sec4_head: "",
-    sec4_content: "",
-
-    sec5_head: "",
-    sec5_list: emptyList(8),
-
-    sec6_head: "",
-    sec6_list2: emptyList2(5),
-
-    testimonial_quote: "",
-    testimonial_author: "",
-    testimonial_position: "",
+    sections: [],
   });
 
-  /** Fetch case studies */
+  /* ----------------------------- Fetch Cases ----------------------------- */
+
   useEffect(() => {
     fetchCases();
   }, []);
@@ -80,30 +70,36 @@ export default function CaseStudiesPage() {
       const res = await api.get("/case-studies");
       setCases(res.data || []);
     } catch (err) {
-      console.error(err);
       toast.error("Failed to load case studies");
     } finally {
       setLoading(false);
     }
   };
 
-  /** Handle base field changes */
-  const handleChange = (e) => {
+  /* ----------------------------- Edit Case ----------------------------- */
+
+  const handleEdit = (item) => {
+    setEditingCase(item);
+
     setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
+      slug: item.slug,
+      meta_title: item.meta_title,
+      meta_description: item.meta_description,
+      title: item.title,
+      date: item.date ? item.date.split("T")[0] : "",
+      category: item.category,
+      tags: item.tags?.join(", "),
+      heroImage: item.heroImage,
+      sections: item.sections || [],
     });
+
+    setIsDialogOpen(true);
   };
 
-  /** Handle nested list */
-  const handleListChange = (section, index, key, value) => {
-    const updated = [...formData[section]];
-    updated[index][key] = value;
-    setFormData({ ...formData, [section]: updated });
-  };
+  /* ----------------------------- Add Case ----------------------------- */
 
-  /** Reset everything */
-  const resetForm = () => {
+  const handleAddNew = () => {
+    setEditingCase(null);
     setFormData({
       slug: "",
       meta_title: "",
@@ -113,92 +109,61 @@ export default function CaseStudiesPage() {
       category: "",
       tags: "",
       heroImage: "",
-
-      sec1_head: "",
-      sec1_content: "",
-
-      sec2_head: "",
-      sec2_content: "",
-
-      sec3_head: "",
-      sec3_list: emptyList(4),
-
-      sec4_head: "",
-      sec4_content: "",
-
-      sec5_head: "",
-      sec5_list: emptyList(8),
-
-      sec6_head: "",
-      sec6_list2: emptyList2(5),
-
-      testimonial_quote: "",
-      testimonial_author: "",
-      testimonial_position: "",
+      sections: [],
     });
-  };
-
-  /** OPEN EDIT */
-  const handleEdit = (item) => {
-    setEditingCase(item);
-
-    const sec = item.sections;
-
-    setFormData({
-      slug: item.slug,
-      meta_title: item.meta_title,
-      meta_description: item.meta_description,
-      title: item.title,
-      date: item.date?.split("T")[0],
-      category: item.category,
-      tags: item.tags?.join(", "),
-      heroImage: item.heroImage,
-
-      sec1_head: sec[0]?.head || "",
-      sec1_content: sec[0]?.content || "",
-
-      sec2_head: sec[1]?.head || "",
-      sec2_content: sec[1]?.content || "",
-
-      sec3_head: sec[2]?.head || "",
-      sec3_list:
-        sec[2]?.content?.map((i) => ({
-          listing: i.listing,
-          subListing: i["sub-listing"],
-        })) || emptyList(4),
-
-      sec4_head: sec[3]?.head || "",
-      sec4_content: sec[3]?.content || "",
-
-      sec5_head: sec[4]?.head || "",
-      sec5_list:
-        sec[5]?.content?.map((i) => ({
-          listing: i.listing,
-          subListing: i["sub-listing"],
-        })) || emptyList(8),
-
-      sec6_head: sec[6]?.head || "",
-      sec6_list2:
-        sec[6]?.content?.map((i) => ({
-          listing: i.listing,
-        })) || emptyList2(5),
-
-      testimonial_quote: sec[7]?.quote || "",
-      testimonial_author: sec[7]?.author || "",
-      testimonial_position: sec[7]?.position || "",
-    });
-
     setIsDialogOpen(true);
   };
 
-  /** OPEN ADD */
-  const handleAddNew = () => {
-    resetForm();
-    setEditingCase(null);
-    setIsDialogOpen(true);
+  /* ----------------------------- Input Update ----------------------------- */
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  /** SUBMIT */
+  const updateSection = (index, key, value) => {
+    const updated = [...formData.sections];
+    updated[index][key] = value;
+    setFormData({ ...formData, sections: updated });
+  };
+
+  const updateSectionType = (index, type) => {
+    const updated = [...formData.sections];
+    updated[index] = createEmptySection(type);
+    setFormData({ ...formData, sections: updated });
+  };
+
+  const updateListItem = (secIndex, itemIndex, key, value) => {
+    const updated = [...formData.sections];
+    updated[secIndex].content[itemIndex][key] = value;
+    setFormData({ ...formData, sections: updated });
+  };
+
+  const addListItem = (secIndex) => {
+    const updated = [...formData.sections];
+    updated[secIndex].content.push({ listing: "", "sub-listing": "" });
+    setFormData({ ...formData, sections: updated });
+  };
+
+  const addListItemSimple = (secIndex) => {
+    const updated = [...formData.sections];
+    updated[secIndex].content.push({ listing: "" });
+    setFormData({ ...formData, sections: updated });
+  };
+
+  const removeListItem = (secIndex, itemIndex) => {
+    const updated = [...formData.sections];
+    updated[secIndex].content.splice(itemIndex, 1);
+    setFormData({ ...formData, sections: updated });
+  };
+
+  const removeSection = (index) => {
+    const updated = [...formData.sections];
+    updated.splice(index, 1);
+    setFormData({ ...formData, sections: updated });
+  };
+
+  /* ----------------------------- Submit ----------------------------- */
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -211,57 +176,7 @@ export default function CaseStudiesPage() {
       category: formData.category,
       tags: formData.tags.split(",").map((t) => t.trim()),
       heroImage: formData.heroImage,
-
-      sections: [
-        {
-          type: "text",
-          head: formData.sec1_head,
-          content: formData.sec1_content,
-        },
-        {
-          type: "text",
-          head: formData.sec2_head,
-          content: formData.sec2_content,
-        },
-        {
-          type: "list",
-          head: formData.sec3_head,
-          content: formData.sec3_list.map((i) => ({
-            listing: i.listing,
-            "sub-listing": i.subListing,
-          })),
-        },
-        {
-          type: "text",
-          head: formData.sec4_head,
-          content: formData.sec4_content,
-        },
-        {
-          type: "text",
-          head: formData.sec5_head,
-          content: "",
-        },
-        {
-          type: "list",
-          content: formData.sec5_list.map((i) => ({
-            listing: i.listing,
-            "sub-listing": i.subListing,
-          })),
-        },
-        {
-          type: "list2",
-          head: formData.sec6_head,
-          content: formData.sec6_list2.map((i) => ({
-            listing: i.listing,
-          })),
-        },
-        {
-          type: "testimonial",
-          quote: formData.testimonial_quote,
-          author: formData.testimonial_author,
-          position: formData.testimonial_position,
-        },
-      ],
+      sections: formData.sections,
     };
 
     try {
@@ -274,15 +189,14 @@ export default function CaseStudiesPage() {
       }
 
       setIsDialogOpen(false);
-      setEditingCase(null);
       fetchCases();
-    } catch (err) {
-      console.error(err);
+    } catch {
       toast.error("Failed to save case study");
     }
   };
 
-  /** DELETE */
+  /* ----------------------------- Delete ----------------------------- */
+
   const handleDelete = async (id) => {
     if (!confirm("Delete this case study?")) return;
 
@@ -290,26 +204,18 @@ export default function CaseStudiesPage() {
       await api.delete(`/case-studies/${id}`);
       toast.success("Deleted!");
       fetchCases();
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to delete");
+    } catch {
+      toast.error("Failed to delete case study");
     }
   };
 
-  /* ------------ UI START ------------ */
+  /* ----------------------------- UI ----------------------------- */
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <Heading>Case Studies</Heading>
-        <div className="h-64 animate-pulse bg-zinc-200 dark:bg-zinc-800 rounded"></div>
-      </div>
-    );
-  }
+  if (loading) return <div className="p-6">Loading...</div>;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex justify-between items-center">
         <Heading>Case Studies</Heading>
         <Button color="blue" onClick={handleAddNew}>
           + Add New
@@ -317,73 +223,45 @@ export default function CaseStudiesPage() {
       </div>
 
       {/* TABLE */}
-      <div className="bg-white dark:bg-zinc-900 shadow-sm rounded-lg border overflow-hidden">
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableHeader>Title</TableHeader>
-              <TableHeader>Slug</TableHeader>
-              <TableHeader>Category</TableHeader>
-              <TableHeader>Tags</TableHeader>
-              <TableHeader>Hero</TableHeader>
-              <TableHeader>Date</TableHeader>
-              <TableHeader>Actions</TableHeader>
-            </TableRow>
-          </TableHead>
+      <Table className="border rounded-lg">
+        <TableHead>
+          <TableRow>
+            <TableHeader>Title</TableHeader>
+            <TableHeader>Slug</TableHeader>
+            <TableHeader>Category</TableHeader>
+            <TableHeader>Date</TableHeader>
+            <TableHeader>Actions</TableHeader>
+          </TableRow>
+        </TableHead>
 
-          <TableBody>
-            {cases.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={7}
-                  className="text-center text-zinc-500 py-8"
+        <TableBody>
+          {cases.map((c) => (
+            <TableRow key={c._id}>
+              <TableCell>{c.title}</TableCell>
+              <TableCell>{c.slug}</TableCell>
+              <TableCell>{c.category}</TableCell>
+              <TableCell>
+                {new Date(c.createdAt).toLocaleDateString()}
+              </TableCell>
+              <TableCell className="flex gap-2">
+                <Button size="sm" onClick={() => handleEdit(c)}>
+                  Edit
+                </Button>
+                <Button
+                  size="sm"
+                  color="red"
+                  onClick={() => handleDelete(c._id)}
                 >
-                  No case studies
-                </TableCell>
-              </TableRow>
-            ) : (
-              cases.map((c) => (
-                <TableRow key={c._id}>
-                  <TableCell>{c.title}</TableCell>
-                  <TableCell>{c.slug}</TableCell>
-                  <TableCell>{c.category}</TableCell>
-                  <TableCell>{c.tags?.join(", ")}</TableCell>
+                  Delete
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
 
-                  <TableCell>
-                    <img
-                      src={c.heroImage}
-                      className="w-10 h-10 rounded object-cover"
-                    />
-                  </TableCell>
+      {/* ----------------------------- MODAL ----------------------------- */}
 
-                  <TableCell>
-                    {new Date(c.createdAt).toLocaleDateString()}
-                  </TableCell>
-
-                  <TableCell className="flex gap-2">
-                    <Button
-                      size="sm"
-                      color="blue"
-                      onClick={() => handleEdit(c)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      size="sm"
-                      color="red"
-                      onClick={() => handleDelete(c._id)}
-                    >
-                      Delete
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
-
-      {/* --------------------- MODAL ---------------------- */}
       <Dialog
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
@@ -391,29 +269,25 @@ export default function CaseStudiesPage() {
       >
         <form
           onSubmit={handleSubmit}
-          className="space-y-6 max-h-[80vh] overflow-y-auto p-4"
+          className="space-y-6 p-4 max-h-[80vh] overflow-y-auto"
         >
           <Heading level={2}>
             {editingCase ? "Edit Case Study" : "Add Case Study"}
           </Heading>
 
-          {/* BASIC INFO */}
           <div className="grid grid-cols-2 gap-4">
             <Input
               label="Slug"
               name="slug"
               value={formData.slug}
               onChange={handleChange}
-              required
             />
             <Input
               label="Title"
               name="title"
               value={formData.title}
               onChange={handleChange}
-              required
             />
-
             <Input
               label="Meta Title"
               name="meta_title"
@@ -426,7 +300,6 @@ export default function CaseStudiesPage() {
               value={formData.meta_description}
               onChange={handleChange}
             />
-
             <Input
               label="Category"
               name="category"
@@ -439,7 +312,6 @@ export default function CaseStudiesPage() {
               value={formData.tags}
               onChange={handleChange}
             />
-
             <Input
               label="Hero Image URL"
               name="heroImage"
@@ -455,166 +327,221 @@ export default function CaseStudiesPage() {
             />
           </div>
 
-          {/* SECTION BLOCK COMPONENT */}
-          {sectionBlock("Section 1 (Text)", [
-            <Input
-              label="Head"
-              name="sec1_head"
-              value={formData.sec1_head}
-              onChange={handleChange}
-            />,
-            textarea(
-              "Content",
-              "sec1_content",
-              formData.sec1_content,
-              handleChange
-            ),
-          ])}
+          {/* ----------------------------- SECTIONS ----------------------------- */}
 
-          {sectionBlock("Section 2 (Text)", [
-            <Input
-              label="Head"
-              name="sec2_head"
-              value={formData.sec2_head}
-              onChange={handleChange}
-            />,
-            textarea(
-              "Content",
-              "sec2_content",
-              formData.sec2_content,
-              handleChange
-            ),
-          ])}
+          {formData.sections.map((sec, index) => (
+            <div key={index} className="border rounded-lg p-4 space-y-3">
+              <Heading level={3}>
+                Section {index + 1} — {sec.type}
+              </Heading>
 
-          {sectionBlock("Section 3 (List)", [
-            <Input
-              label="Head"
-              name="sec3_head"
-              value={formData.sec3_head}
-              onChange={handleChange}
-            />,
-            ...formData.sec3_list.map((item, i) => (
-              <div key={i} className="grid grid-cols-2 gap-2">
-                <Input
-                  label={`Listing ${i + 1}`}
-                  value={item.listing}
-                  onChange={(e) =>
-                    handleListChange("sec3_list", i, "listing", e.target.value)
-                  }
-                />
-                <Input
-                  label={`Sub Listing ${i + 1}`}
-                  value={item.subListing}
-                  onChange={(e) =>
-                    handleListChange(
-                      "sec3_list",
-                      i,
-                      "subListing",
-                      e.target.value
-                    )
-                  }
-                />
-              </div>
-            )),
-          ])}
+              {/* SECTION TYPE DROPDOWN */}
+              <select
+                value={sec.type}
+                onChange={(e) => updateSectionType(index, e.target.value)}
+                className="border p-2 rounded w-full !bg-gray "
+              >
+                <option value="text">Text</option>
+                <option value="image">Image</option>
+                <option value="list">List</option>
+                <option value="list2">List2</option>
+                <option value="testimonial">Testimonial</option>
+              </select>
 
-          {sectionBlock("Section 4 (Text)", [
-            <Input
-              label="Head"
-              name="sec4_head"
-              value={formData.sec4_head}
-              onChange={handleChange}
-            />,
-            textarea(
-              "Content",
-              "sec4_content",
-              formData.sec4_content,
-              handleChange
-            ),
-          ])}
+              {/* TEXT */}
+              {sec.type === "text" && (
+                <>
+                  <Input
+                    label="Head (optional)"
+                    value={sec.head}
+                    onChange={(e) =>
+                      updateSection(index, "head", e.target.value)
+                    }
+                  />
+                  <Textarea
+                    label="Content"
+                    value={sec.content}
+                    onChange={(e) =>
+                      updateSection(index, "content", e.target.value)
+                    }
+                  />
+                </>
+              )}
 
-          {sectionBlock("Section 5 (List)", [
-            <Input
-              label="Head"
-              name="sec5_head"
-              value={formData.sec5_head}
-              onChange={handleChange}
-            />,
-            ...formData.sec5_list.map((item, i) => (
-              <div key={i} className="grid grid-cols-2 gap-2">
-                <Input
-                  label={`Listing ${i + 1}`}
-                  value={item.listing}
-                  onChange={(e) =>
-                    handleListChange("sec5_list", i, "listing", e.target.value)
-                  }
-                />
-                <Input
-                  label={`Sub Listing ${i + 1}`}
-                  value={item.subListing}
-                  onChange={(e) =>
-                    handleListChange(
-                      "sec5_list",
-                      i,
-                      "subListing",
-                      e.target.value
-                    )
-                  }
-                />
-              </div>
-            )),
-          ])}
+              {/* IMAGE */}
+              {sec.type === "image" && (
+                <>
+                  <Input
+                    label="Image URL"
+                    value={sec.imageSrc}
+                    onChange={(e) =>
+                      updateSection(index, "imageSrc", e.target.value)
+                    }
+                  />
+                  <Input
+                    label="Alt Text"
+                    value={sec.imageAlt}
+                    onChange={(e) =>
+                      updateSection(index, "imageAlt", e.target.value)
+                    }
+                  />
+                  <Textarea
+                    label="Caption (optional)"
+                    value={sec.content}
+                    onChange={(e) =>
+                      updateSection(index, "content", e.target.value)
+                    }
+                  />
+                </>
+              )}
 
-          {sectionBlock("Section 6 (List2)", [
-            <Input
-              label="Head"
-              name="sec6_head"
-              value={formData.sec6_head}
-              onChange={handleChange}
-            />,
-            ...formData.sec6_list2.map((item, i) => (
-              <Input
-                key={i}
-                label={`Point ${i + 1}`}
-                value={item.listing}
-                onChange={(e) =>
-                  handleListChange("sec6_list2", i, "listing", e.target.value)
-                }
-              />
-            )),
-          ])}
+              {/* LIST */}
+              {sec.type === "list" && (
+                <>
+                  <Input
+                    label="Head (optional)"
+                    value={sec.head}
+                    onChange={(e) =>
+                      updateSection(index, "head", e.target.value)
+                    }
+                  />
 
-          {sectionBlock("Testimonial", [
-            textarea(
-              "Quote",
-              "testimonial_quote",
-              formData.testimonial_quote,
-              handleChange
-            ),
-            <Input
-              label="Author"
-              name="testimonial_author"
-              value={formData.testimonial_author}
-              onChange={handleChange}
-            />,
-            <Input
-              label="Position"
-              name="testimonial_position"
-              value={formData.testimonial_position}
-              onChange={handleChange}
-            />,
-          ])}
+                  {sec.content.map((item, i) => (
+                    <div key={i} className="grid grid-cols-2 gap-2 relative">
+                      <Input
+                        label={`Listing ${i + 1}`}
+                        value={item.listing}
+                        onChange={(e) =>
+                          updateListItem(index, i, "listing", e.target.value)
+                        }
+                      />
 
-          {/* ACTION BUTTONS */}
-          <div className="flex justify-end gap-2 pt-3 border-t">
-            <Button
-              color="zinc"
-              type="button"
-              onClick={() => setIsDialogOpen(false)}
-            >
+                      <Input
+                        label={`Sub Listing ${i + 1}`}
+                        value={item["sub-listing"]}
+                        onChange={(e) =>
+                          updateListItem(
+                            index,
+                            i,
+                            "sub-listing",
+                            e.target.value
+                          )
+                        }
+                      />
+
+                      {/* REMOVE BUTTON */}
+                      <button
+                        type="button"
+                        onClick={() => removeListItem(index, i)}
+                        className="absolute -right-4 top-1 text-red-500 text-xl"
+                      >
+                        ❌
+                      </button>
+                    </div>
+                  ))}
+
+                  <Button type="button" onClick={() => addListItem(index)}>
+                    + Add Item
+                  </Button>
+                </>
+              )}
+
+              {/* LIST2 */}
+              {sec.type === "list2" && (
+                <>
+                  <Input
+                    label="Head"
+                    value={sec.head}
+                    onChange={(e) =>
+                      updateSection(index, "head", e.target.value)
+                    }
+                  />
+
+                  {sec.content.map((item, i) => (
+                    <div key={i} className="relative">
+                      <Input
+                        label={`Point ${i + 1}`}
+                        value={item.listing}
+                        onChange={(e) =>
+                          updateListItem(index, i, "listing", e.target.value)
+                        }
+                      />
+
+                      {/* REMOVE BUTTON */}
+                      <button
+                        type="button"
+                        onClick={() => removeListItem(index, i)}
+                        className="absolute -right-4 top-3 text-red-500 text-xl"
+                      >
+                        ❌
+                      </button>
+                    </div>
+                  ))}
+
+                  <Button
+                    type="button"
+                    onClick={() => addListItemSimple(index)}
+                  >
+                    + Add Point
+                  </Button>
+                </>
+              )}
+
+              {/* TESTIMONIAL */}
+              {sec.type === "testimonial" && (
+                <>
+                  <Textarea
+                    label="Quote"
+                    value={sec.quote}
+                    onChange={(e) =>
+                      updateSection(index, "quote", e.target.value)
+                    }
+                  />
+                  <Input
+                    label="Author"
+                    value={sec.author}
+                    onChange={(e) =>
+                      updateSection(index, "author", e.target.value)
+                    }
+                  />
+                  <Input
+                    label="Position"
+                    value={sec.position}
+                    onChange={(e) =>
+                      updateSection(index, "position", e.target.value)
+                    }
+                  />
+                </>
+              )}
+
+              <Button
+                color="red"
+                type="button"
+                onClick={() => removeSection(index)}
+              >
+                Delete Section
+              </Button>
+            </div>
+          ))}
+
+          <Button
+            type="button"
+            color="blue"
+            onClick={() =>
+              setFormData({
+                ...formData,
+                sections: [...formData.sections, createEmptySection("text")],
+              })
+            }
+          >
+            + Add Section
+          </Button>
+
+          <div className="flex justify-end pt-4 gap-2">
+            <Button type="button" onClick={() => setIsDialogOpen(false)}>
               Cancel
             </Button>
-            <Button color="blue" type="submit">
+            <Button type="submit" color="blue">
               {editingCase ? "Update" : "Add"}
             </Button>
           </div>
@@ -624,27 +551,17 @@ export default function CaseStudiesPage() {
   );
 }
 
-/* Helpers */
+/* ----------------------------- Textarea Component ----------------------------- */
 
-function sectionBlock(title, children) {
-  return (
-    <div className="border rounded-lg p-4 space-y-3 bg-white dark:bg-zinc-900">
-      <Heading level={3}>{title}</Heading>
-      {children}
-    </div>
-  );
-}
-
-function textarea(label, name, value, onChange) {
+function Textarea({ label, value, onChange }) {
   return (
     <div className="space-y-1">
-      <label className="font-medium text-sm">{label}</label>
+      <label className="text-sm font-medium">{label}</label>
       <textarea
-        name={name}
+        rows={3}
         value={value}
         onChange={onChange}
-        rows={3}
-        className="w-full border rounded p-2"
+        className="border p-2 rounded w-full"
       />
     </div>
   );
