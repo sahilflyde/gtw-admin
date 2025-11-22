@@ -343,6 +343,8 @@ export default function CaseStudiesPage() {
               >
                 <option value="text">Text</option>
                 <option value="image">Image</option>
+
+
                 <option value="list">List</option>
                 <option value="list2">List2</option>
                 <option value="testimonial">Testimonial</option>
@@ -549,6 +551,8 @@ export default function CaseStudiesPage() {
       </Dialog>
     </div>
   );
+
+  
 }
 
 /* ----------------------------- Textarea Component ----------------------------- */
